@@ -33,8 +33,8 @@ module "arc_security_group" {
   source  = "sourcefuse/arc-security-group/aws"
   version = "0.0.1"
 
-  count = length(var.security_groups) == 0 ? 1 : 0
-  name          = "${var.namespace}-${var.environment}-${var.name}-sg"
+  count         = length(var.security_groups) == 0 ? 1 : 0
+  name          = var.security_group_name
   vpc_id        = var.vpc_id
   ingress_rules = var.security_group_data.ingress_rules
   egress_rules  = var.security_group_data.egress_rules
@@ -46,28 +46,28 @@ module "arc_security_group" {
 #                 Load Balancer
 ###################################################################
 resource "aws_lb" "this" {
-  name                     = var.load_balancer_config.name
-  name_prefix              = var.load_balancer_config.name_prefix
-  load_balancer_type       = var.load_balancer_config.load_balancer_type
-  internal                 = var.load_balancer_config.internal
-  security_groups          = [for sg in module.arc_security_group : sg.id]
-  ip_address_type          = var.load_balancer_config.ip_address_type
-  enable_deletion_protection = var.load_balancer_config.enable_deletion_protection
-  enable_cross_zone_load_balancing = var.load_balancer_config.enable_cross_zone_load_balancing
-  enable_http2             = var.load_balancer_config.enable_http2
-  enable_waf_fail_open     = var.load_balancer_config.enable_waf_fail_open
-  enable_xff_client_port   = var.load_balancer_config.enable_xff_client_port
-  enable_zonal_shift       = var.load_balancer_config.enable_zonal_shift
-  desync_mitigation_mode   = var.load_balancer_config.desync_mitigation_mode
-  drop_invalid_header_fields = var.load_balancer_config.drop_invalid_header_fields
+  name                                                         = var.load_balancer_config.name
+  name_prefix                                                  = var.load_balancer_config.name_prefix
+  load_balancer_type                                           = var.load_balancer_config.type
+  internal                                                     = var.load_balancer_config.internal
+  security_groups                                              = [for sg in module.arc_security_group : sg.id]
+  ip_address_type                                              = var.load_balancer_config.ip_address_type
+  enable_deletion_protection                                   = var.load_balancer_config.enable_deletion_protection
+  enable_cross_zone_load_balancing                             = var.load_balancer_config.enable_cross_zone_load_balancing
+  enable_http2                                                 = var.load_balancer_config.enable_http2
+  enable_waf_fail_open                                         = var.load_balancer_config.enable_waf_fail_open
+  enable_xff_client_port                                       = var.load_balancer_config.enable_xff_client_port
+  enable_zonal_shift                                           = var.load_balancer_config.enable_zonal_shift
+  desync_mitigation_mode                                       = var.load_balancer_config.desync_mitigation_mode
+  drop_invalid_header_fields                                   = var.load_balancer_config.drop_invalid_header_fields
   enforce_security_group_inbound_rules_on_private_link_traffic = var.load_balancer_config.enforce_security_group_inbound_rules_on_private_link_traffic
-  idle_timeout             = var.load_balancer_config.idle_timeout
-  preserve_host_header     = var.load_balancer_config.preserve_host_header
-  xff_header_processing_mode = var.load_balancer_config.xff_header_processing_mode
-  customer_owned_ipv4_pool = var.load_balancer_config.customer_owned_ipv4_pool
-  dns_record_client_routing_policy = var.load_balancer_config.dns_record_client_routing_policy
-  client_keep_alive        = var.load_balancer_config.client_keep_alive
-  enable_tls_version_and_cipher_suite_headers = var.load_balancer_config.enable_tls_version_and_cipher_suite_headers
+  idle_timeout                                                 = var.load_balancer_config.idle_timeout
+  preserve_host_header                                         = var.load_balancer_config.preserve_host_header
+  xff_header_processing_mode                                   = var.load_balancer_config.xff_header_processing_mode
+  customer_owned_ipv4_pool                                     = var.load_balancer_config.customer_owned_ipv4_pool
+  dns_record_client_routing_policy                             = var.load_balancer_config.dns_record_client_routing_policy
+  client_keep_alive                                            = var.load_balancer_config.client_keep_alive
+  enable_tls_version_and_cipher_suite_headers                  = var.load_balancer_config.enable_tls_version_and_cipher_suite_headers
 
   dynamic "subnet_mapping" {
     for_each = var.load_balancer_config.subnet_mapping
@@ -97,7 +97,7 @@ resource "aws_lb" "this" {
     }
   }
 
-  tags = module.tags.tags
+  tags = var.tags
 }
 
 
@@ -106,23 +106,22 @@ resource "aws_lb" "this" {
 #                 Target Group
 ###################################################################
 resource "aws_lb_target_group" "this" {
-  for_each = var.target_group_config != null ? { for idx, target_group in var.target_group_config : idx => target_group } : {}
-
-  name                        = var.target_group_config.name
-  name_prefix                 = var.target_group_config.name_prefix
-  port                        = var.target_group_config.port
-  protocol                    = var.target_group_config.protocol
-  vpc_id                      = var.target_group_config.vpc_id
-  ip_address_type             = var.target_group_config.ip_address_type
+  for_each                          = var.target_group_config != null ? { "config" = var.target_group_config } : {}
+  name                              = var.target_group_config.name
+  name_prefix                       = var.target_group_config.name_prefix
+  port                              = var.target_group_config.port
+  protocol                          = var.target_group_config.protocol
+  vpc_id                            = var.vpc_id
+  ip_address_type                   = var.target_group_config.ip_address_type
   load_balancing_anomaly_mitigation = var.target_group_config.load_balancing_anomaly_mitigation
   load_balancing_cross_zone_enabled = var.target_group_config.load_balancing_cross_zone_enabled
-  preserve_client_ip          = var.target_group_config.preserve_client_ip
-  protocol_version            = var.target_group_config.protocol_version
-  load_balancing_algorithm_type = var.target_group_config.load_balancing_algorithm_type
-  target_type                 = var.target_group_config.target_type
-  proxy_protocol_v2           = var.target_group_config.proxy_protocol_v2
-  slow_start                  = var.target_group_config.slow_start
-  tags                        = var.target_group_config.tags
+  preserve_client_ip                = var.target_group_config.preserve_client_ip
+  protocol_version                  = var.target_group_config.protocol_version
+  load_balancing_algorithm_type     = var.target_group_config.load_balancing_algorithm_type
+  target_type                       = var.target_group_config.target_type
+  proxy_protocol_v2                 = var.target_group_config.proxy_protocol_v2
+  slow_start                        = var.target_group_config.slow_start
+  tags                              = var.tags
 
   # Health Check
   dynamic "health_check" {
@@ -201,7 +200,7 @@ resource "aws_lb_target_group" "this" {
 resource "aws_lb_target_group_attachment" "this" {
   for_each = var.target_group_attachment_config != null ? { for idx, attachment in var.target_group_attachment_config : idx => attachment } : {}
 
-  target_group_arn = aws_lb_target_group.this[each.key].arn
+  target_group_arn = aws_lb_target_group.this["config"].arn
   target_id        = each.value.target_id
   port             = each.value.port
 
@@ -217,13 +216,13 @@ resource "aws_lb_target_group_attachment" "this" {
 resource "aws_lb_trust_store" "this" {
   for_each = var.lb_trust_store_config != null ? { for idx, trust_store in var.lb_trust_store_config : idx => trust_store } : {}
 
-  name                     = each.value.name
-  name_prefix              = each.value.name_prefix
-  tags                     = each.value.tags
-  ca_certificates_bundle_s3_bucket = each.value.ca_certificates_bundle_s3_bucket
-  ca_certificates_bundle_s3_key    = each.value.ca_certificates_bundle_s3_key
+  name                                     = each.value.name
+  name_prefix                              = each.value.name_prefix
+  ca_certificates_bundle_s3_bucket         = each.value.ca_certificates_bundle_s3_bucket
+  ca_certificates_bundle_s3_key            = each.value.ca_certificates_bundle_s3_key
   ca_certificates_bundle_s3_object_version = each.value.ca_certificates_bundle_s3_object_version
 
+  tags = var.tags
 }
 
 
@@ -232,105 +231,95 @@ resource "aws_lb_trust_store" "this" {
 ###################################################################
 
 resource "aws_lb_listener" "this" {
-  load_balancer_arn = aws_lb.this.arn
-  port              = var.alb_listener.port
-  protocol          = var.alb_listener.protocol
-  alpn_policy       = var.alb_listener.alpn_policy
-  certificate_arn   = var.alb_listener.certificate_arn
-  ssl_policy        = var.alb_listener.ssl_policy
+  load_balancer_arn        = aws_lb.this.arn
+  port                     = var.alb_listener.port
+  protocol                 = var.alb_listener.protocol
+  alpn_policy              = var.alb_listener.alpn_policy
+  certificate_arn          = var.alb_listener.certificate_arn
+  ssl_policy               = var.alb_listener.ssl_policy
   tcp_idle_timeout_seconds = var.alb_listener.tcp_idle_timeout_seconds
 
   # Optional: Default action with dynamic actions
   dynamic "default_action" {
-  for_each = var.default_action
-  content {
-    type = default_action.value.type
+    for_each = var.default_action
+    content {
+      type = default_action.value.type
 
-    # OIDC Authentication action - Only if authenticate_oidc is provided
-    dynamic "authenticate_oidc" {
-      for_each = lookup(default_action.value, "authenticate_oidc", null) != null ? [default_action.value.authenticate_oidc] : []
-      content {
-        authorization_endpoint = authenticate_oidc.value.authorization_endpoint
-        authentication_request_extra_params = authenticate_oidc.value.authentication_request_extra_params
-        client_id              = authenticate_oidc.value.client_id
-        client_secret          = authenticate_oidc.value.client_secret
-        issuer                 = authenticate_oidc.value.issuer
-        token_endpoint         = authenticate_oidc.value.token_endpoint
-        user_info_endpoint     = authenticate_oidc.value.user_info_endpoint
-        on_unauthenticated_request       = authenticate_oidc.value.on_unauthenticated_request
-        scope                            = authenticate_oidc.value.scope
-        session_cookie_name              = authenticate_oidc.value.session_cookie_name
-        session_timeout                  = authenticate_oidc.value.session_timeout
-      }
-    }
-
-    # Cognito Authentication action - Only if authenticate_cognito is provided
-    dynamic "authenticate_cognito" {
-      for_each = lookup(default_action.value, "authenticate_cognito", null) != null ? [default_action.value.authenticate_cognito] : []
-      content {
-        user_pool_arn                    = authenticate_cognito.value.user_pool_arn
-        user_pool_client_id              = authenticate_cognito.value.user_pool_client_id
-        user_pool_domain                 = authenticate_cognito.value.user_pool_domain
-        authentication_request_extra_params = authenticate_cognito.value.authentication_request_extra_params
-        on_unauthenticated_request       = authenticate_cognito.value.on_unauthenticated_request
-        scope                            = authenticate_cognito.value.scope
-        session_cookie_name              = authenticate_cognito.value.session_cookie_name
-        session_timeout                  = authenticate_cognito.value.session_timeout
-      }
-    }
-
-    # Fixed Response action - Only if fixed_response is provided
-    dynamic "fixed_response" {
-      for_each = lookup(default_action.value, "fixed_response", null) != null ? [default_action.value.fixed_response] : []
-      content {
-        status_code  = fixed_response.value.status_code
-        content_type = fixed_response.value.content_type
-        message_body = fixed_response.value.message_body
-      }
-    }
-
-    # Forward action - Only if forward is provided
-    dynamic "forward" {
-      for_each = lookup(default_action.value, "forward", null) != null ? [default_action.value.forward] : []
-      content {
-        target_group {
-          arn = aws_lb_target_group.this[var.alb_target_group[0].name].arn
-        }
-
-        stickiness {
-          duration = forward.value.stickiness.duration
-          enabled  = forward.value.stickiness.enabled
+      # OIDC Authentication action - Only if authenticate_oidc is provided
+      dynamic "authenticate_oidc" {
+        for_each = lookup(default_action.value, "authenticate_oidc", null) != null ? [default_action.value.authenticate_oidc] : []
+        content {
+          authorization_endpoint              = authenticate_oidc.value.authorization_endpoint
+          authentication_request_extra_params = authenticate_oidc.value.authentication_request_extra_params
+          client_id                           = authenticate_oidc.value.client_id
+          client_secret                       = authenticate_oidc.value.client_secret
+          issuer                              = authenticate_oidc.value.issuer
+          token_endpoint                      = authenticate_oidc.value.token_endpoint
+          user_info_endpoint                  = authenticate_oidc.value.user_info_endpoint
+          on_unauthenticated_request          = authenticate_oidc.value.on_unauthenticated_request
+          scope                               = authenticate_oidc.value.scope
+          session_cookie_name                 = authenticate_oidc.value.session_cookie_name
+          session_timeout                     = authenticate_oidc.value.session_timeout
         }
       }
-    }
 
-    # Redirect action - Only if redirect is provided
-    dynamic "redirect" {
-      for_each = lookup(default_action.value, "redirect", null) != null ? [default_action.value.redirect] : []
-      content {
-        host        = redirect.value.host
-        path        = redirect.value.path
-        query       = redirect.value.query
-        protocol    = redirect.value.protocol
-        port        = redirect.value.port
-        status_code = redirect.value.status_code
+      # Cognito Authentication action - Only if authenticate_cognito is provided
+      dynamic "authenticate_cognito" {
+        for_each = lookup(default_action.value, "authenticate_cognito", null) != null ? [default_action.value.authenticate_cognito] : []
+        content {
+          user_pool_arn                       = authenticate_cognito.value.user_pool_arn
+          user_pool_client_id                 = authenticate_cognito.value.user_pool_client_id
+          user_pool_domain                    = authenticate_cognito.value.user_pool_domain
+          authentication_request_extra_params = authenticate_cognito.value.authentication_request_extra_params
+          on_unauthenticated_request          = authenticate_cognito.value.on_unauthenticated_request
+          scope                               = authenticate_cognito.value.scope
+          session_cookie_name                 = authenticate_cognito.value.session_cookie_name
+          session_timeout                     = authenticate_cognito.value.session_timeout
+        }
       }
-    }
 
-   # Dynamic mutual_authentication block
-  # dynamic "mutual_authentication" {
-  #   for_each = lookup(default_action.value, "mutual_authentication", null) != null ? [default_action.value.mutual_authentication] : []
-  #   content {
-  #     advertise_trust_store_ca_names = mutual_authentication.value.advertise_trust_store_ca_names
-  #     ignore_client_certificate_expiry = mutual_authentication.value.ignore_client_certificate_expiry
-  #     mode                           = mutual_authentication.value.mode
-  #     trust_store_arn                = mutual_authentication.value.trust_store_arn
-  #   }
-  # }
+      # Fixed Response action - Only if fixed_response is provided
+      dynamic "fixed_response" {
+        for_each = lookup(default_action.value, "fixed_response", null) != null ? [default_action.value.fixed_response] : []
+        content {
+          status_code  = fixed_response.value.status_code
+          content_type = fixed_response.value.content_type
+          message_body = fixed_response.value.message_body
+        }
+      }
+
+      # Forward action - Only if forward is provided
+      dynamic "forward" {
+        for_each = lookup(default_action.value, "forward", null) != null ? [default_action.value.forward] : []
+        content {
+          target_group {
+            arn = aws_lb_target_group.this[var.alb_target_group[0].name].arn
+          }
+
+          stickiness {
+            duration = forward.value.stickiness.duration
+            enabled  = forward.value.stickiness.enabled
+          }
+        }
+      }
+
+      # Redirect action - Only if redirect is provided
+      dynamic "redirect" {
+        for_each = lookup(default_action.value, "redirect", null) != null ? [default_action.value.redirect] : []
+        content {
+          host        = redirect.value.host
+          path        = redirect.value.path
+          query       = redirect.value.query
+          protocol    = redirect.value.protocol
+          port        = redirect.value.port
+          status_code = redirect.value.status_code
+        }
+      }
+
+    }
   }
-}
 
-  tags = module.tags.tags 
+  tags = var.tags
 }
 
 
@@ -384,32 +373,32 @@ resource "aws_lb_listener_rule" "this" {
       dynamic "authenticate_cognito" {
         for_each = action.value.authenticate_cognito != null ? [action.value.authenticate_cognito] : []
         content {
-          user_pool_arn                   = authenticate_cognito.value.user_pool_arn
-          user_pool_client_id             = authenticate_cognito.value.user_pool_client_id
-          user_pool_domain                = authenticate_cognito.value.user_pool_domain
-          on_unauthenticated_request      = authenticate_cognito.value.on_unauthenticated_request
+          user_pool_arn                       = authenticate_cognito.value.user_pool_arn
+          user_pool_client_id                 = authenticate_cognito.value.user_pool_client_id
+          user_pool_domain                    = authenticate_cognito.value.user_pool_domain
+          on_unauthenticated_request          = authenticate_cognito.value.on_unauthenticated_request
           authentication_request_extra_params = authenticate_cognito.value.authentication_request_extra_params
-          session_cookie_name              = authenticate_cognito.value.session_cookie_name
-          session_timeout                  = authenticate_cognito.value.session_timeout
+          session_cookie_name                 = authenticate_cognito.value.session_cookie_name
+          session_timeout                     = authenticate_cognito.value.session_timeout
         }
       }
 
       dynamic "authenticate_oidc" {
-      for_each = lookup(action.value, "authenticate_oidc", null) != null ? [action.value.authenticate_oidc] : []
-      content {
-        authorization_endpoint = authenticate_oidc.value.authorization_endpoint
-        authentication_request_extra_params = authenticate_oidc.value.authentication_request_extra_params
-        client_id              = authenticate_oidc.value.client_id
-        client_secret          = authenticate_oidc.value.client_secret
-        issuer                 = authenticate_oidc.value.issuer
-        token_endpoint         = authenticate_oidc.value.token_endpoint
-        user_info_endpoint     = authenticate_oidc.value.user_info_endpoint
-        on_unauthenticated_request       = authenticate_oidc.value.on_unauthenticated_request
-        scope                            = authenticate_oidc.value.scope
-        session_cookie_name              = authenticate_oidc.value.session_cookie_name
-        session_timeout                  = authenticate_oidc.value.session_timeout
+        for_each = lookup(action.value, "authenticate_oidc", null) != null ? [action.value.authenticate_oidc] : []
+        content {
+          authorization_endpoint              = authenticate_oidc.value.authorization_endpoint
+          authentication_request_extra_params = authenticate_oidc.value.authentication_request_extra_params
+          client_id                           = authenticate_oidc.value.client_id
+          client_secret                       = authenticate_oidc.value.client_secret
+          issuer                              = authenticate_oidc.value.issuer
+          token_endpoint                      = authenticate_oidc.value.token_endpoint
+          user_info_endpoint                  = authenticate_oidc.value.user_info_endpoint
+          on_unauthenticated_request          = authenticate_oidc.value.on_unauthenticated_request
+          scope                               = authenticate_oidc.value.scope
+          session_cookie_name                 = authenticate_oidc.value.session_cookie_name
+          session_timeout                     = authenticate_oidc.value.session_timeout
+        }
       }
-    }
     }
   }
 
@@ -431,5 +420,5 @@ resource "aws_lb_listener_rule" "this" {
       }
     }
   }
-
+  tags = var.tags
 }

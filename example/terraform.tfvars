@@ -1,13 +1,13 @@
-name                     = "arc-load-balancer"
-load_balancer_type       = "application" 
-internal                 = false         
-idle_timeout             = 60           
-enable_deletion_protection = false      
-ip_address_type          = "ipv4"  
-region                   = "us-east-1"
-environment             = "dev"
-namespace               = "arc"
-security_group_name      = "arc-alb-sg"
+name                       = "arc-load-balancer"
+load_balancer_type         = "application"
+internal                   = false
+idle_timeout               = 60
+enable_deletion_protection = false
+ip_address_type            = "ipv4"
+region                     = "us-east-1"
+environment                = "dev"
+namespace                  = "arc"
+security_group_name        = "arc-alb-sg"
 
 
 # Subnets for the load balancer
@@ -18,34 +18,34 @@ vpc_id = "vpc-68f96212"
 
 
 load_balancer_config = {
-  name                              = "arc-load-balancer"
-  type                = "application"
-  internal                          = false
-  security_groups                   = ["sg-123456"]
-  ip_address_type                   = "ipv4"
-  enable_deletion_protection        = false
-  enable_cross_zone_load_balancing  = true
-  enable_http2                      = false
-  enable_waf_fail_open              = false
-  enable_xff_client_port            = false
-  enable_zonal_shift                = false
-  desync_mitigation_mode            = "defensive"
-  drop_invalid_header_fields        = false
+  name                                                         = "arc-load-balancer"
+  type                                                         = "application"
+  internal                                                     = false
+  security_groups                                              = ["sg-123456"]
+  ip_address_type                                              = "ipv4"
+  enable_deletion_protection                                   = false
+  enable_cross_zone_load_balancing                             = true
+  enable_http2                                                 = false
+  enable_waf_fail_open                                         = false
+  enable_xff_client_port                                       = false
+  enable_zonal_shift                                           = false
+  desync_mitigation_mode                                       = "defensive"
+  drop_invalid_header_fields                                   = false
   enforce_security_group_inbound_rules_on_private_link_traffic = "off"
-  idle_timeout                      = 60
-  preserve_host_header              = false
-  xff_header_processing_mode        = "append"
-  customer_owned_ipv4_pool         = null
-  dns_record_client_routing_policy  = "any_availability_zone"
-  client_keep_alive                 = 60
-  enable_tls_version_and_cipher_suite_headers = false
+  idle_timeout                                                 = 60
+  preserve_host_header                                         = false
+  xff_header_processing_mode                                   = "append"
+  customer_owned_ipv4_pool                                     = null
+  dns_record_client_routing_policy                             = "any_availability_zone"
+  client_keep_alive                                            = 60
+  enable_tls_version_and_cipher_suite_headers                  = false
 
   subnet_mapping = [
     {
-      subnet_id            = "subnet-6781cb49"
+      subnet_id = "subnet-6781cb49"
     },
     {
-      subnet_id            = "subnet-f55c1392"
+      subnet_id = "subnet-f55c1392"
     }
   ]
 
@@ -103,10 +103,10 @@ access_logs = {
 }
 
 connection_logs = {
-    bucket  = "arc-terraform-alb-logs"
-    prefix  = "lb-logs"
-    enabled = false
-  }
+  bucket  = "arc-terraform-alb-logs"
+  prefix  = "lb-logs"
+  enabled = false
+}
 
 # Subnet mapping (optional, use if needed)
 subnet_mapping = [
@@ -132,40 +132,40 @@ target_group_config = {
   target_type = "ip"
   health_check = {
     enabled             = true
-    interval            = 30         # Time in seconds between health checks
+    interval            = 30 # Time in seconds between health checks
     path                = "/"
-    port                = 80         # The port on which to perform the health check
+    port                = 80 # The port on which to perform the health check
     protocol            = "HTTP"
-    timeout             = 5          # Time in seconds to wait for a response
-    unhealthy_threshold = 3          # Number of consecutive failed health checks
-    healthy_threshold   = 2          # Number of consecutive successful health checks
-    matcher             = "200"      # Expected response code from the health check
+    timeout             = 5     # Time in seconds to wait for a response
+    unhealthy_threshold = 3     # Number of consecutive failed health checks
+    healthy_threshold   = 2     # Number of consecutive successful health checks
+    matcher             = "200" # Expected response code from the health check
   }
   stickiness = {
     enabled         = true
     type            = "lb_cookie"
-    cookie_duration = 3600  # Cookie duration in seconds
+    cookie_duration = 3600 # Cookie duration in seconds
   }
 }
 
 target_group_attachment_config = [
   {
-    target_id       = "172.31.88.62"  # Instance ID
-    target_type     = "ip"
-    port            = 80
-    availability_zone = "us-east-1a"  }
+    target_id   = "172.31.88.62" # Instance ID
+    target_type = "ip"
+    port        = 80
+  availability_zone = "us-east-1a" }
 ]
 
 
- cidr_blocks = null
-  # listener_rules = []
+cidr_blocks = null
+# listener_rules = []
 
-    alb = {
-    name       = "arc-poc-alb"
-    internal   = false
-    port       = 80
-    create_alb = false
-  }
+alb = {
+  name       = "arc-poc-alb"
+  internal   = false
+  port       = 80
+  create_alb = false
+}
 
 
 #   default_actions = [
@@ -200,7 +200,7 @@ default_action = [
   #   }
   # },
   {
-    type             = "redirect"
+    type = "redirect"
     redirect = {
       host        = "example.com"
       path        = "/new-path"
@@ -237,15 +237,15 @@ default_action = [
 ]
 
 
-port = 80
+port     = 80
 protocol = "HTTP"
 alb_listener = {
-  port                     = 80               
-  protocol                 = "HTTP"            
-  #  alpn_policy              = "HTTP2Only"        
+  port     = 80
+  protocol = "HTTP"
+  #  alpn_policy              = "HTTP2Only"
   # certificate_arn          = ""
-  # ssl_policy               = "ELBSecurityPolicy-2016-08"  
-  # tcp_idle_timeout_seconds = 360           
+  # ssl_policy               = "ELBSecurityPolicy-2016-08"
+  # tcp_idle_timeout_seconds = 360
 }
 
 listener_rules = {
@@ -307,11 +307,10 @@ listener_rules = {
 
 # SSL and Listener settings
 # certificate_arn = "arn:aws:acm:region:account-id:certificate/certificate-id"
-ssl_policy      = null
+ssl_policy = null
 # port            = 443
 # protocol        = "HTTPS"
- alpn_policy     = null
+alpn_policy = null
 
 # Optional settings
 tcp_idle_timeout_seconds = 60
-
