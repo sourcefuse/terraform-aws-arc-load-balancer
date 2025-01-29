@@ -1,5 +1,15 @@
 
-bucket_name = "arc-terraform-alb-logs-1"
+name                     = "arc-load-balancer"
+bucket_name              = "arc-terraform-alb-logs-1"
+load_balancer_type       = "network" 
+internal                 = false         
+idle_timeout             = 60           
+enable_deletion_protection = false      
+ip_address_type          = "ipv4"  
+region                   = "us-east-1"
+environment             = "dev"
+namespace               = "arc"
+security_group_name      = "arc-alb-sg"
 
 network_forward_action = true
 
