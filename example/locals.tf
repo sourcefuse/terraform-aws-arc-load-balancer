@@ -24,10 +24,10 @@ locals {
 
     subnet_mapping = [
       {
-        subnet_id = "subnet-6781cb49"
+        subnet_id = data.aws_subnet.private.id
       },
       {
-        subnet_id = "subnet-f55c1392"
+        subnet_id = data.aws_subnet.private.id
       }
     ]
 

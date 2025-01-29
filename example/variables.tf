@@ -12,6 +12,18 @@ variable "security_group_name" {
   description = "The name of the security group"
 }
 
+variable "subnet_names" {
+  type        = list(string)
+  description = "List of subnet names to lookup"
+  default     = ["arc-poc-private-subnet-private-us-east-1a", "arc-poc-private-subnet-private-us-east-1b"]
+}
+
+variable "vpc_name" {
+  type        = string
+  description = "Name of the VPC to add the resources"
+  default     = "arc-poc-vpc"
+}
+
 variable "vpc_id" {
   description = "The VPC ID for the resources"
   type        = string

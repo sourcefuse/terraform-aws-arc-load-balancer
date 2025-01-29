@@ -1,69 +1,10 @@
-name                       = "arc-load-balancer"
-bucket_name                = "arc-terraform-alb-logs-1"
-load_balancer_type         = "network"
-internal                   = false
-idle_timeout               = 60
-enable_deletion_protection = false
-ip_address_type            = "ipv4"
-region                     = "us-east-1"
-environment                = "dev"
-namespace                  = "arc"
-security_group_name        = "arc-alb-sg"
-default_forward_action     = false
 
+bucket_name = "arc-terraform-alb-logs-1"
 
-# Subnets for the load balancer
-subnets = ["subnet-6781cb49", "subnet-f55c1392"]
+network_forward_action = true
 
-# VPC configuration
-vpc_id = "vpc-68f96212"
-
-
-load_balancer_config = {
-  name                                                         = "arc-load-balancer"
-  type                                                         = "application"
-  internal                                                     = false
-  security_groups                                              = ["sg-123456"]
-  ip_address_type                                              = "ipv4"
-  enable_deletion_protection                                   = false
-  enable_cross_zone_load_balancing                             = true
-  enable_http2                                                 = false
-  enable_waf_fail_open                                         = false
-  enable_xff_client_port                                       = false
-  enable_zonal_shift                                           = false
-  desync_mitigation_mode                                       = "defensive"
-  drop_invalid_header_fields                                   = false
-  enforce_security_group_inbound_rules_on_private_link_traffic = "off"
-  idle_timeout                                                 = 60
-  preserve_host_header                                         = false
-  xff_header_processing_mode                                   = "append"
-  customer_owned_ipv4_pool                                     = null
-  dns_record_client_routing_policy                             = "any_availability_zone"
-  client_keep_alive                                            = 60
-  enable_tls_version_and_cipher_suite_headers                  = false
-
-  subnet_mapping = [
-    {
-      subnet_id = "subnet-6781cb49"
-    },
-    {
-      subnet_id = "subnet-f55c1392"
-    }
-  ]
-
-  access_logs = {
-    enabled = false
-    bucket  = "my-log-bucket"
-    prefix  = "access-logs"
-  }
-
-  connection_logs = {
-    enabled = false
-    bucket  = "my-log-bucket"
-    prefix  = "connection-logs"
-  }
-}
-
+vpc_name    = "Default VPC"
+subnet_name = ["vnk-1", "vnk-2"]
 
 # Security group rules
 security_group_data = {
@@ -100,7 +41,7 @@ security_group_data = {
 target_group_config = {
   name        = "arc-poc-alb"
   port        = 80
-  protocol    = "HTTP"
+  protocol    = "TCP"
   vpc_id      = "vpc-68f96212"
   target_type = "instance"
   health_check = {
@@ -213,7 +154,7 @@ default_action = [{
 
 alb_listener = {
   port     = 88
-  protocol = "HTTP"
+  protocol = "TCP"
   #  alpn_policy              = "HTTP2Only"
   # certificate_arn          = "arn:aws:acm:us-east-1:804295906245:certificate/08759044-ad33-4bdb-b18c-7de7f85e272a"
   # ssl_policy               = "ELBSecurityPolicy-TLS13-1-2-2021-06"

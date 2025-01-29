@@ -18,7 +18,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | ../ | n/a |
+| <a name="module_elb"></a> [elb](#module\_elb) | ../ | n/a |
 | <a name="module_s3"></a> [s3](#module\_s3) | sourcefuse/arc-s3/aws | 0.0.4 |
 | <a name="module_tags"></a> [tags](#module\_tags) | sourcefuse/arc-tags/aws | 1.2.6 |
 
@@ -27,6 +27,9 @@
 | Name | Type |
 |------|------|
 | [aws_iam_policy_document.alb_logs_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+| [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
+| [aws_vpc.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
@@ -40,9 +43,11 @@
 | <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"us-east-1"` | no |
 | <a name="input_security_group_data"></a> [security\_group\_data](#input\_security\_group\_data) | n/a | <pre>object({<br>    security_group_ids_to_attach = optional(list(string), []),<br>    create                       = optional(bool, true),<br>    description                  = optional(string, null),<br>    ingress_rules = optional(list(object({<br>      description              = optional(string, null)<br>      cidr_block               = optional(string, null)<br>      source_security_group_id = optional(string, null)<br>      from_port                = number<br>      ip_protocol              = string<br>      to_port                  = string<br>      self                     = optional(bool, false)<br>    })), []),<br>    egress_rules = optional(list(object({<br>      description                   = optional(string, null)<br>      cidr_block                    = optional(string, null)<br>      destination_security_group_id = optional(string, null)<br>      from_port                     = number<br>      ip_protocol                   = string<br>      to_port                       = string<br>      prefix_list_id                = optional(string, null)<br>    })), [])<br>  })</pre> | <pre>{<br>  "create": false<br>}</pre> | no |
 | <a name="input_security_group_name"></a> [security\_group\_name](#input\_security\_group\_name) | The name of the security group | `string` | n/a | yes |
+| <a name="input_subnet_names"></a> [subnet\_names](#input\_subnet\_names) | List of subnet names to lookup | `list(string)` | <pre>[<br>  "arc-poc-private-subnet-private-us-east-1a",<br>  "arc-poc-private-subnet-private-us-east-1b"<br>]</pre> | no |
 | <a name="input_target_group_attachment_config"></a> [target\_group\_attachment\_config](#input\_target\_group\_attachment\_config) | List of target group attachment configurations | <pre>list(object({<br>    target_id         = string<br>    target_type       = string # Values: "instance", "ip", or "lambda"<br>    port              = optional(number)<br>    availability_zone = optional(string)<br>  }))</pre> | `null` | no |
 | <a name="input_target_group_config"></a> [target\_group\_config](#input\_target\_group\_config) | n/a | <pre>object({<br>    name                              = optional(string)<br>    name_prefix                       = optional(string)<br>    port                              = optional(number)<br>    protocol                          = optional(string)<br>    vpc_id                            = optional(string)<br>    ip_address_type                   = optional(string)<br>    load_balancing_anomaly_mitigation = optional(bool)<br>    load_balancing_cross_zone_enabled = optional(bool)<br>    preserve_client_ip                = optional(bool)<br>    protocol_version                  = optional(string)<br>    load_balancing_algorithm_type     = optional(string)<br>    target_type                       = optional(string)<br>    proxy_protocol_v2                 = optional(bool)<br>    slow_start                        = optional(number)<br><br>    health_check = optional(object({<br>      enabled             = bool<br>      interval            = number<br>      path                = string<br>      port                = number<br>      protocol            = string<br>      timeout             = number<br>      unhealthy_threshold = number<br>      healthy_threshold   = number<br>      matcher             = string<br>    }))<br><br>    stickiness = optional(object({<br>      type            = string<br>      cookie_duration = number<br>      cookie_name     = optional(string)<br>      enabled         = bool<br>    }))<br>  })</pre> | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC ID for the resources | `string` | n/a | yes |
+| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name of the VPC to add the resources | `string` | `"arc-poc-vpc"` | no |
 
 ## Outputs
 
