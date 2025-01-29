@@ -7,6 +7,18 @@ variable "region" {
   description = "AWS region"
 }
 
+variable "environment" {
+  type        = string
+  description = "Name of the environment, i.e. dev, stage, prod"
+  default     = "dev"
+}
+
+variable "namespace" {
+  type        = string
+  default     = "arc"
+  description = "Namespace of the project, i.e. arc"
+}
+
 variable "security_group_name" {
   type        = string
   description = "The name of the security group"
@@ -23,12 +35,6 @@ variable "vpc_name" {
   description = "Name of the VPC to add the resources"
   default     = "arc-poc-vpc"
 }
-
-variable "vpc_id" {
-  description = "The VPC ID for the resources"
-  type        = string
-}
-
 
 variable "security_group_data" {
   type = object({
