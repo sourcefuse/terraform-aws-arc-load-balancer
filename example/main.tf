@@ -29,10 +29,14 @@ module "tags" {
   }
 }
 
+################################################################################
+## application load balancer
+################################################################################
+
 module "alb" {
   source                         = "../"
   region                         = var.region
-  load_balancer_config           = local.load_balancer_config
+  load_balancer_config           = var.load_balancer_config
   target_group_config            = var.target_group_config
   target_group_attachment_config = var.target_group_attachment_config
   alb_listener                   = var.alb_listener
@@ -44,19 +48,27 @@ module "alb" {
   tags                           = module.tags.tags
 }
 
-# module "elb" {
-#   source                         = "../"
-#   region                         = var.region
-#   load_balancer_config           = local.load_balancer_config
-#   target_group_config            = var.target_group_config
-#   target_group_attachment_config = var.target_group_attachment_config
-#   alb_listener                   = var.alb_listener
-#   network_forward_action         = var.network_forward_action
-#   security_group_data            = var.security_group_data
-#   security_group_name            = var.security_group_name
-#   vpc_id                         = data.aws_vpc.default.id
-#   tags                           = module.tags.tags
-# }
+################################################################################
+## network load balancer
+################################################################################
+
+module "nlb" {
+  source                         = "../"
+  region                         = var.region
+  load_balancer_config           = var.load_balancer_config
+  target_group_config            = var.target_group_config
+  target_group_attachment_config = var.target_group_attachment_config
+  alb_listener                   = var.alb_listener
+  network_forward_action         = var.network_forward_action
+  security_group_data            = var.security_group_data
+  security_group_name            = var.security_group_name
+  vpc_id                         = data.aws_vpc.default.id
+  tags                           = module.tags.tags
+}
+
+################################################################################
+## S3 bucket for logs
+################################################################################
 
 module "s3" {
   source            = "sourcefuse/arc-s3/aws"

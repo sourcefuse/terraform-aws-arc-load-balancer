@@ -10,12 +10,10 @@ variable "region" {
 variable "environment" {
   type        = string
   description = "Name of the environment, i.e. dev, stage, prod"
-  default     = "dev"
 }
 
 variable "namespace" {
   type        = string
-  default     = "arc"
   description = "Namespace of the project, i.e. arc"
 }
 
@@ -33,9 +31,14 @@ variable "subnet_names" {
 variable "vpc_name" {
   type        = string
   description = "Name of the VPC to add the resources"
-  default     = "arc-poc-vpc"
 }
 
+variable "bucket_name" {
+  description = "The name of the bucket"
+  type        = string
+}
+
+############### security group config ###############
 variable "security_group_data" {
   type = object({
     security_group_ids_to_attach = optional(list(string), []),
@@ -65,6 +68,53 @@ variable "security_group_data" {
   }
 }
 
+########## alb security group config ##########
+variable "load_balancer_config" {
+  type = object({
+    name                                                         = optional(string, null)
+    name_prefix                                                  = optional(string, null)
+    type                                                         = optional(string, "application")
+    internal                                                     = optional(bool, false)
+    ip_address_type                                              = optional(string, "ipv4")
+    enable_deletion_protection                                   = optional(bool, true)
+    enable_cross_zone_load_balancing                             = optional(bool, true)
+    enable_http2                                                 = optional(bool, true)
+    enable_waf_fail_open                                         = optional(bool, false)
+    enable_xff_client_port                                       = optional(bool, true)
+    enable_zonal_shift                                           = optional(bool, true)
+    desync_mitigation_mode                                       = optional(string, "defensive")
+    drop_invalid_header_fields                                   = optional(bool, false)
+    enforce_security_group_inbound_rules_on_private_link_traffic = optional(string, "off")
+    idle_timeout                                                 = optional(number, 60)
+    preserve_host_header                                         = optional(bool, true)
+    xff_header_processing_mode                                   = optional(string, "append")
+    customer_owned_ipv4_pool                                     = optional(string, null)
+    dns_record_client_routing_policy                             = optional(string, "any_availability_zone")
+    client_keep_alive                                            = optional(number, 60)
+    enable_tls_version_and_cipher_suite_headers                  = optional(bool, true)
+
+    subnet_mapping = optional(list(object({
+      subnet_id            = string
+      allocation_id        = optional(string, null)
+      ipv6_address         = optional(string, null)
+      private_ipv4_address = optional(string, null)
+    })))
+
+    access_logs = optional(object({
+      enabled = optional(bool, false)
+      bucket  = string
+      prefix  = optional(string, "access-logs")
+    }))
+
+    connection_logs = optional(object({
+      enabled = optional(bool, false)
+      bucket  = string
+      prefix  = optional(string, "connection-logs")
+    }), )
+  })
+}
+
+########## alb target group config ##########
 variable "target_group_config" {
   type = object({
     name                              = optional(string)
@@ -116,6 +166,7 @@ variable "target_group_attachment_config" {
   default = null
 }
 
+######### alb listener config ##########
 variable "alb_listener" {
   type = object({
     port                     = optional(number, 80)
@@ -126,8 +177,6 @@ variable "alb_listener" {
     tcp_idle_timeout_seconds = optional(number, 350)
   })
 }
-
-######### alb listener config ##########
 
 variable "network_forward_action" {
   description = "Default forward action for the ALB listener."
@@ -244,8 +293,3 @@ variable "listener_rules" {
   }))
 }
 
-
-variable "bucket_name" {
-  description = "The name of the bucket"
-  type        = string
-}

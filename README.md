@@ -1,16 +1,59 @@
 # terraform-aws-module-template
+![Module Structure](./static/banner.png)
+# [terraform-aws-arc-load-balancer](https://github.com/sourcefuse/terraform-aws-arc-load-balancer)
+
+<a href="https://github.com/sourcefuse/terraform-aws-arc-load-balancer/releases/latest"><img src="https://img.shields.io/github/release/sourcefuse/terraform-aws-arc-load-balancer.svg?style=for-the-badge" alt="Latest Release"/></a> <a href="https://github.com/sourcefuse/terraform-aws-arc-load-balancer/commits"><img src="https://img.shields.io/github/last-commit/sourcefuse/terraform-aws-arc-load-balancer.svg?style=for-the-badge" alt="Last Updated"/></a> ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sourcefuse_terraform-aws-arc-load-balancer&token=6306baee2d5d0acf189ee2eecd9a6d354522c0b5)](https://sonarcloud.io/summary/new_code?id=sourcefuse_terraform-aws-arc-load-balancer)
+
+[![Known Vulnerabilities](https://github.com/sourcefuse/terraform-aws-arc-load-balancer/actions/workflows/snyk.yaml/badge.svg)](https://github.com/sourcefuse/terraform-aws-arc-load-balancer/actions/workflows/snyk.yaml)
 
 ## Overview
 
-SourceFuse AWS Reference Architecture (ARC) Terraform module for managing _________.
+The SourceFuse AWS ARC Terraform module provides an easy way to deploy and manage Application Load Balancers (ALB) and Network Load Balancers (NLB). It ensures high availability by deploying load balancers across multiple Availability Zones and supports flexible traffic routing with customizable listener rules and target groups. The module also includes built-in security options to control traffic access via security groups and integrates with CloudWatch for performance monitoring and health checks. With this module, you can easily set up reliable and secure load balancing for both web (ALB) and TCP (NLB) traffic.
 
 ## Usage
 
 To see a full example, check out the [main.tf](./example/main.tf) file in the example folder.  
 
 ```hcl
-module "this" {
-  source = "git::https://github.com/sourcefuse/terraform-aws-refarch-<module_name>"
+################################################################################
+## application load balancer
+################################################################################
+
+module "alb" {
+  source                         = "sourcefuse/arc-load-balancer/aws"
+  version                        = "0.0.1"
+  region                         = var.region
+  load_balancer_config           = var.load_balancer_config
+  target_group_config            = var.target_group_config
+  target_group_attachment_config = var.target_group_attachment_config
+  alb_listener                   = var.alb_listener
+  default_action                 = var.default_action
+  listener_rules                 = var.listener_rules
+  security_group_data            = var.security_group_data
+  security_group_name            = var.security_group_name
+  vpc_id                         = data.aws_vpc.default.id
+  tags                           = module.tags.tags
+}
+
+################################################################################
+## network load balancer
+################################################################################
+
+module "nlb" {
+  source                         = "sourcefuse/arc-load-balancer/aws"
+  version                        = "0.0.1"
+  region                         = var.region
+  load_balancer_config           = var.load_balancer_config
+  target_group_config            = var.target_group_config
+  target_group_attachment_config = var.target_group_attachment_config
+  alb_listener                   = var.alb_listener
+  network_forward_action         = var.network_forward_action
+  security_group_data            = var.security_group_data
+  security_group_name            = var.security_group_name
+  vpc_id                         = data.aws_vpc.default.id
+  tags                           = module.tags.tags
 }
 ```
 
