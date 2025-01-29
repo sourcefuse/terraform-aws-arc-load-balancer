@@ -1,19 +1,3 @@
-terraform {
-  required_version = ">= 1.5.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-
-provider "aws" {
-  region = var.region
-}
-
 module "tags" {
   source  = "sourcefuse/arc-tags/aws"
   version = "1.2.6"
@@ -101,12 +85,11 @@ resource "aws_lb" "this" {
 }
 
 
-
 ###################################################################
 #                 Target Group
 ###################################################################
 resource "aws_lb_target_group" "this" {
-  for_each                          = var.target_group_config != null ? { "config" = var.target_group_config } : {}
+  count                             = var.target_group_config != null ? 1 : 0
   name                              = var.target_group_config.name
   name_prefix                       = var.target_group_config.name_prefix
   port                              = var.target_group_config.port
@@ -125,7 +108,7 @@ resource "aws_lb_target_group" "this" {
 
   # Health Check
   dynamic "health_check" {
-    for_each = each.value.health_check != null ? [each.value.health_check] : []
+    for_each = var.target_group_config.health_check != null ? [var.target_group_config.health_check] : []
     content {
       enabled             = health_check.value.enabled
       interval            = health_check.value.interval
@@ -193,6 +176,7 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+
 ###################################################################
 #                Target Group Attachment
 ###################################################################
@@ -200,7 +184,7 @@ resource "aws_lb_target_group" "this" {
 resource "aws_lb_target_group_attachment" "this" {
   for_each = var.target_group_attachment_config != null ? { for idx, attachment in var.target_group_attachment_config : idx => attachment } : {}
 
-  target_group_arn = aws_lb_target_group.this["config"].arn
+  target_group_arn = aws_lb_target_group.this[0].arn
   target_id        = each.value.target_id
   port             = each.value.port
 
@@ -229,7 +213,6 @@ resource "aws_lb_trust_store" "this" {
 ###################################################################
 #                 Listener
 ###################################################################
-
 resource "aws_lb_listener" "this" {
   load_balancer_arn        = aws_lb.this.arn
   port                     = var.alb_listener.port
@@ -239,13 +222,21 @@ resource "aws_lb_listener" "this" {
   ssl_policy               = var.alb_listener.ssl_policy
   tcp_idle_timeout_seconds = var.alb_listener.tcp_idle_timeout_seconds
 
-  # Optional: Default action with dynamic actions
+  # Forward action for network load balancer
+  dynamic "default_action" {
+    for_each = var.network_forward_action ? [1] : []
+    content {
+      target_group_arn = aws_lb_target_group.this[0].arn
+      type             = "forward"
+    }
+  }
+
   dynamic "default_action" {
     for_each = var.default_action
     content {
       type = default_action.value.type
 
-      # OIDC Authentication action - Only if authenticate_oidc is provided
+      # OIDC Authentication action
       dynamic "authenticate_oidc" {
         for_each = lookup(default_action.value, "authenticate_oidc", null) != null ? [default_action.value.authenticate_oidc] : []
         content {
@@ -263,7 +254,7 @@ resource "aws_lb_listener" "this" {
         }
       }
 
-      # Cognito Authentication action - Only if authenticate_cognito is provided
+      # Cognito Authentication action
       dynamic "authenticate_cognito" {
         for_each = lookup(default_action.value, "authenticate_cognito", null) != null ? [default_action.value.authenticate_cognito] : []
         content {
@@ -278,7 +269,7 @@ resource "aws_lb_listener" "this" {
         }
       }
 
-      # Fixed Response action - Only if fixed_response is provided
+      # Fixed Response action
       dynamic "fixed_response" {
         for_each = lookup(default_action.value, "fixed_response", null) != null ? [default_action.value.fixed_response] : []
         content {
@@ -288,22 +279,29 @@ resource "aws_lb_listener" "this" {
         }
       }
 
-      # Forward action - Only if forward is provided
+      #Forward action with multiple target groups
       dynamic "forward" {
         for_each = lookup(default_action.value, "forward", null) != null ? [default_action.value.forward] : []
         content {
-          target_group {
-            arn = aws_lb_target_group.this[var.alb_target_group[0].name].arn
+          dynamic "target_group" {
+            for_each = forward.value.target_groups
+            content {
+              arn    = aws_lb_target_group.this[0].arn
+              weight = lookup(target_group.value, "weight", null) != null ? target_group.value.weight : null
+            }
           }
 
-          stickiness {
-            duration = forward.value.stickiness.duration
-            enabled  = forward.value.stickiness.enabled
+          dynamic "stickiness" {
+            for_each = lookup(forward.value, "stickiness", null) != null ? [forward.value.stickiness] : []
+            content {
+              duration = stickiness.value.duration
+              enabled  = lookup(stickiness.value, "enabled", false)
+            }
           }
         }
       }
 
-      # Redirect action - Only if redirect is provided
+      # Redirect action
       dynamic "redirect" {
         for_each = lookup(default_action.value, "redirect", null) != null ? [default_action.value.redirect] : []
         content {
@@ -315,12 +313,12 @@ resource "aws_lb_listener" "this" {
           status_code = redirect.value.status_code
         }
       }
-
     }
   }
 
   tags = var.tags
 }
+
 
 
 ###################################################################

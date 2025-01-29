@@ -17,47 +17,6 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "load_balancer_config" {
-  type = object({
-    name                                                         = optional(string, null)
-    name_prefix                                                  = optional(string, null)
-    type                                                         = optional(string, "application")
-    internal                                                     = optional(bool, false)
-    ip_address_type                                              = optional(string, "ipv4")
-    enable_deletion_protection                                   = optional(bool, true)
-    enable_cross_zone_load_balancing                             = optional(bool, true)
-    enable_http2                                                 = optional(bool, true)
-    enable_waf_fail_open                                         = optional(bool, false)
-    enable_xff_client_port                                       = optional(bool, true)
-    enable_zonal_shift                                           = optional(bool, true)
-    desync_mitigation_mode                                       = optional(string, "defensive")
-    drop_invalid_header_fields                                   = optional(bool, false)
-    enforce_security_group_inbound_rules_on_private_link_traffic = optional(string, "off")
-    idle_timeout                                                 = optional(number, 60)
-    preserve_host_header                                         = optional(bool, true)
-    xff_header_processing_mode                                   = optional(string, "append")
-    customer_owned_ipv4_pool                                     = optional(string, null)
-    dns_record_client_routing_policy                             = optional(string, "any_availability_zone")
-    client_keep_alive                                            = optional(number, 60)
-    enable_tls_version_and_cipher_suite_headers                  = optional(bool, true)
-    subnet_mapping = optional(list(object({
-      subnet_id            = string
-      allocation_id        = optional(string, null)
-      ipv6_address         = optional(string, null)
-      private_ipv4_address = optional(string, null)
-    })))
-    access_logs = optional(object({
-      enabled = optional(bool, false)
-      bucket  = string
-      prefix  = optional(string, "access-logs")
-    }))
-    connection_logs = optional(object({
-      enabled = optional(bool, false)
-      bucket  = string
-      prefix  = optional(string, "connection-logs")
-    }))
-  })
-}
 
 variable "security_group_data" {
   type = object({
@@ -127,6 +86,18 @@ variable "target_group_config" {
   default = null
 }
 
+########## alb target group attachment config ##########
+variable "target_group_attachment_config" {
+  description = "List of target group attachment configurations"
+  type = list(object({
+    target_id         = string
+    target_type       = string # Values: "instance", "ip", or "lambda"
+    port              = optional(number)
+    availability_zone = optional(string)
+  }))
+  default = null
+}
+
 variable "alb_listener" {
   type = object({
     port                     = optional(number, 80)
@@ -139,53 +110,64 @@ variable "alb_listener" {
 }
 
 ######### alb listener config ##########
+
+variable "network_forward_action" {
+  description = "Default forward action for the ALB listener."
+  type        = bool
+  default     = false
+}
+
 variable "default_action" {
-  description = "A list of default actions for the load balancer listener"
+  description = "Default actions for the ALB listener."
   type = list(object({
     type = string
+
     authenticate_oidc = optional(object({
       authorization_endpoint              = string
-      authentication_request_extra_params = map(string)
+      authentication_request_extra_params = optional(map(string), {})
       client_id                           = string
       client_secret                       = string
       issuer                              = string
       token_endpoint                      = string
       user_info_endpoint                  = string
-      on_unauthenticated_request          = string
-      scope                               = string
-      session_cookie_name                 = string
-      session_timeout                     = string
+      on_unauthenticated_request          = optional(string, "deny")
+      scope                               = optional(string)
+      session_cookie_name                 = optional(string)
+      session_timeout                     = optional(number)
     }))
+
     authenticate_cognito = optional(object({
       user_pool_arn                       = string
       user_pool_client_id                 = string
       user_pool_domain                    = string
-      authentication_request_extra_params = map(string)
-      on_unauthenticated_request          = string
-      scope                               = string
-      session_cookie_name                 = string
-      session_timeout                     = string
+      authentication_request_extra_params = optional(map(string), {})
+      on_unauthenticated_request          = optional(string, "deny")
+      scope                               = optional(string)
+      session_cookie_name                 = optional(string)
+      session_timeout                     = optional(number)
     }))
+
     fixed_response = optional(object({
       status_code  = string
-      content_type = string
-      message_body = string
+      content_type = optional(string, "text/plain")
+      message_body = optional(string, "")
     }))
+
     forward = optional(object({
-      target_group = list(object({
-        arn = string
+      target_groups = list(object({
+        weight = optional(number, null)
       }))
       stickiness = optional(object({
         duration = number
-        enabled  = bool
+        enabled  = optional(bool, false)
       }))
     }))
     redirect = optional(object({
-      host        = string
-      path        = string
-      query       = string
-      protocol    = string
-      port        = string
+      host        = optional(string)
+      path        = optional(string)
+      query       = optional(string)
+      protocol    = optional(string)
+      port        = optional(number)
       status_code = string
     }))
   }))
@@ -242,4 +224,10 @@ variable "listener_rules" {
       }))
     }))
   }))
+}
+
+
+variable "bucket_name" {
+  description = "The name of the bucket"
+  type        = string
 }

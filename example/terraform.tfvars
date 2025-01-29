@@ -1,5 +1,6 @@
 name                       = "arc-load-balancer"
-load_balancer_type         = "application"
+bucket_name                = "arc-terraform-alb-logs-1"
+load_balancer_type         = "network"
 internal                   = false
 idle_timeout               = 60
 enable_deletion_protection = false
@@ -8,6 +9,7 @@ region                     = "us-east-1"
 environment                = "dev"
 namespace                  = "arc"
 security_group_name        = "arc-alb-sg"
+default_forward_action     = false
 
 
 # Subnets for the load balancer
@@ -95,41 +97,12 @@ security_group_data = {
 }
 
 
-# Access logs configuration
-access_logs = {
-  enabled = false
-  bucket  = "arc-terraform-alb-logs"
-  prefix  = "load-balancer-logs"
-}
-
-connection_logs = {
-  bucket  = "arc-terraform-alb-logs"
-  prefix  = "lb-logs"
-  enabled = false
-}
-
-# Subnet mapping (optional, use if needed)
-subnet_mapping = [
-  {
-    subnet_id            = "subnet-6781cb49"
-    allocation_id        = null
-    ipv6_address         = null
-    private_ipv4_address = null
-  },
-  {
-    subnet_id            = "subnet-f55c1392"
-    allocation_id        = null
-    ipv6_address         = null
-    private_ipv4_address = null
-  }
-]
-
 target_group_config = {
-  name        = "arc-poc-alb-tg"
+  name        = "arc-poc-alb"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = "vpc-68f96212"
-  target_type = "ip"
+  target_type = "instance"
   health_check = {
     enabled             = true
     interval            = 30 # Time in seconds between health checks
@@ -141,126 +114,125 @@ target_group_config = {
     healthy_threshold   = 2     # Number of consecutive successful health checks
     matcher             = "200" # Expected response code from the health check
   }
-  stickiness = {
-    enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = 3600 # Cookie duration in seconds
-  }
+  # stickiness = {
+  #   enabled         = true
+  #   type            = "lb_cookie"
+  #   cookie_duration = 3600  # Cookie duration in seconds
+  # }
 }
 
 target_group_attachment_config = [
   {
-    target_id   = "172.31.88.62" # Instance ID
-    target_type = "ip"
+    target_id   = "i-024cca3753df50299" # Instance ID
+    target_type = "instance"
     port        = 80
-  availability_zone = "us-east-1a" }
+    # availability_zone = "us-east-1a"
+  }
 ]
 
 
 cidr_blocks = null
-# listener_rules = []
-
-alb = {
-  name       = "arc-poc-alb"
-  internal   = false
-  port       = 80
-  create_alb = false
-}
 
 
-#   default_actions = [
+# default_action = [
 #   {
-#     type = "forward"
+#     type             = "forward"
 #     forward = {
-#       stickiness = {
-#         enabled  = true
-#         duration = 60
-#       }
+#       # arn = null
+#       target_groups = [
+#         {
+#           weight           = 20
+#         }
+#       ]
+#       # stickiness = {
+#       #   duration = 300
+#       #   enabled  = true
+#       # }
 #     }
+#   },
+
+# {
+#   type             = "redirect"
+#   redirect = {
+#     host        = "divyasf.sourcef.us"
+#     path        = "/new-path"
+#     query       = "?id=123"
+#     protocol    = "HTTPS"
+#     port        = "443"
+#     status_code = "HTTP_301"
 #   }
+# },
+# {
+#   type             = "authenticate-oidc"
+#   authenticate_oidc = {
+#     authorization_endpoint = "https://example.com/authorize"
+#     client_id              = "your-client-id"
+#     client_secret          = "your-client-secret"
+#     issuer                 = "https://example.com"
+#     token_endpoint         = "https://example.com/token"
+#     user_info_endpoint     = "https://example.com/userinfo"
+#   }
+# },
+# {
+#   type             = "authenticate-cognito"
+#   authenticate_cognito = {
+#     user_pool_arn                     = "arn:aws:cognito-idp:us-east-1:804295906245:userpool/us-east-1_9XOuJux4d"
+#     user_pool_client_id               = "1dks0el3q70530ove0dp8mj6gp"
+#     user_pool_domain                  = "us-east-19xoujux4d"
+#     authentication_request_extra_params = { "param1" = "value1" }
+#     on_unauthenticated_request        = "deny"
+#     scope                             = "openid"
+#     session_cookie_name               = "AWSELBAuthSessionCookie"
+#     session_timeout                   = 3600
+#   }
+#   },
+#     {
+#   type             = "fixed-response"
+#   fixed_response = {
+#     status_code  = "200"
+#     content_type = "text/plain"
+#     message_body = "Hello, World!"
+#   }
+# },
 # ]
 
-
-default_action = [
-  # {
-  #   type             = "forward"
-  #   forward = {
-  #     stickiness = {
-  #       duration = 300
-  #       enabled  = true
-  #     }
-  #   }
-  # },
-  # {
-  #   type             = "fixed-response"
-  #   fixed_response = {
-  #     status_code  = "200"
-  #     content_type = "text/plain"
-  #     message_body = "Hello, World!"
-  #   }
-  # },
-  {
-    type = "redirect"
-    redirect = {
-      host        = "example.com"
-      path        = "/new-path"
-      query       = "?id=123"
-      protocol    = "HTTP"
-      port        = "80"
-      status_code = "HTTP_301"
+default_action = [{
+  type = "forward"
+  forward = {
+    target_groups = [{
+      # arn = aws_lb_target_group.this.arn
+      weight = 20
+    }]
+    stickiness = {
+      duration = 300
+      enabled  = true
     }
-  },
-  # {
-  #   type             = "authenticate_oidc"
-  #   authenticate_oidc = {
-  #     authorization_endpoint = "https://example.com/authorize"
-  #     client_id              = "your-client-id"
-  #     client_secret          = "your-client-secret"
-  #     issuer                 = "https://example.com"
-  #     token_endpoint         = "https://example.com/token"
-  #     user_info_endpoint     = "https://example.com/userinfo"
-  #   }
-  # },
-  # {
-  #   type             = "authenticate_cognito"
-  #   authenticate_cognito = {
-  #     user_pool_arn                     = "arn:aws:cognito-idp:region:account-id:userpool/user-pool-id"
-  #     user_pool_client_id               = "client-id"
-  #     user_pool_domain                  = "your-cognito-domain"
-  #     authentication_request_extra_params = { "param1" = "value1" }
-  #     on_unauthenticated_request        = "deny"
-  #     scope                             = "openid profile"
-  #     session_cookie_name               = "my-session-cookie"
-  #     session_timeout                   = 3600
-  #   }
-  # }
-]
+  }
+}]
 
 
-port     = 80
-protocol = "HTTP"
 alb_listener = {
-  port     = 80
+  port     = 88
   protocol = "HTTP"
   #  alpn_policy              = "HTTP2Only"
-  # certificate_arn          = ""
-  # ssl_policy               = "ELBSecurityPolicy-2016-08"
+  # certificate_arn          = "arn:aws:acm:us-east-1:804295906245:certificate/08759044-ad33-4bdb-b18c-7de7f85e272a"
+  # ssl_policy               = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   # tcp_idle_timeout_seconds = 360
 }
 
 listener_rules = {
   rule1 = {
-    priority = 1
+    priority = 9
     actions = [
       {
         type  = "redirect"
         order = 1
         redirect = {
-          host        = "example.com"
+          host        = "divyasf.sourcef.us"
           path        = "/redirect"
           query       = "action=redirect"
-          protocol    = "HTTP"
-          port        = 80
+          protocol    = "HTTPS"
+          port        = 443
           status_code = "HTTP_301"
         }
       }
@@ -272,10 +244,10 @@ listener_rules = {
         }
       }
     ]
-  }
+  },
 
   rule2 = {
-    priority = 2
+    priority = 999
     actions = [
       {
         type  = "fixed-response"
@@ -307,10 +279,10 @@ listener_rules = {
 
 # SSL and Listener settings
 # certificate_arn = "arn:aws:acm:region:account-id:certificate/certificate-id"
-ssl_policy = null
+# ssl_policy      = null
 # port            = 443
 # protocol        = "HTTPS"
-alpn_policy = null
+#  alpn_policy     = null
 
 # Optional settings
-tcp_idle_timeout_seconds = 60
+# tcp_idle_timeout_seconds = 60
