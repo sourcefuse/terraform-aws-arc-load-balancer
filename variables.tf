@@ -174,6 +174,7 @@ variable "target_group_attachment_config" {
   default = null
 }
 
+
 ########## alb trsut store config ##########
 variable "lb_trust_store_config" {
   description = "The configuration for the Load Balancer Trust Stores"
