@@ -42,4 +42,3 @@ output "target_group_arn" {
   description = "ARN of the target group"
   value       = module.nlb.target_group_arn
 }
-
