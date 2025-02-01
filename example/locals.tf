@@ -1,6 +1,6 @@
 locals {
-  security_group_name    = "arc-alb-sg"
-  network_forward_action = true
+  security_group_name = "arc-alb-sg"
+  # network_forward_action = true
 
   load_balancer_config = {
     name                                        = "arc-load-balancer"
