@@ -81,11 +81,11 @@ locals {
       healthy_threshold   = 2
       matcher             = "200"
     }
-    stickiness = {
-      enabled         = true
-      # type            = "lb_cookie"
-      cookie_duration = 3600
-    }
+    # stickiness = {
+    #   enabled         = true
+    #   # type            = "lb_cookie"
+    #   cookie_duration = 3600
+    # }
   }
 
   target_group_attachment_config = [
