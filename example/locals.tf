@@ -68,7 +68,7 @@ locals {
   target_group_config = {
     name        = "arc-poc-alb"
     port        = 80
-    protocol    = "HTTP"
+    protocol    = "TCP"
     target_type = "instance"
     health_check = {
       enabled             = true
@@ -111,7 +111,7 @@ locals {
 
   alb_listener = {
     port     = 88
-    protocol = "HTTP"
+    protocol = "TCP"
   }
 
   listener_rules = {
