@@ -52,7 +52,7 @@ Refer to the Terraform Registry for the latest version.
 Integrate the module with your existing Terraform mono repo configuration, follow the steps below:
 
 - Create a new folder in terraform/ named load-balancer.
-- Create the required files, see the [example](https://github.com/sourcefuse/terraform-aws-arc-load-balancer/tree/main/example) 
+- Create the required files, see the [example](https://github.com/sourcefuse/terraform-aws-arc-load-balancer/tree/main/example)
 to base off of.
 - Configure with your backend:
    - **region**: Where the backend resides
@@ -66,7 +66,7 @@ to base off of.
 Ensure that the AWS credentials used to execute Terraform have the necessary permissions to create, list and modify:
 
 - Load balancer
-- s3 
+- s3
 
 
 ## Module Configuration
@@ -134,4 +134,3 @@ This module is licensed under the Apache 2.0 license. Refer to the [LICENSE](htt
 ### Open Source Contribution
 
 Contribute to open source by using and enhancing this module. Your contributions are welcome!
-
