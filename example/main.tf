@@ -32,20 +32,20 @@ module "tags" {
 ################################################################################
 ## application load balancer
 ################################################################################
-module "alb" {
-  source                         = "../"
-  region                         = var.region
-  load_balancer_config           = local.load_balancer_config
-  target_group_config            = local.target_group_config
-  target_group_attachment_config = local.target_group_attachment_config
-  alb_listener                   = local.alb_listener
-  default_action                 = local.default_action
-  listener_rules                 = local.listener_rules
-  security_group_data            = local.security_group_data
-  security_group_name            = local.security_group_name
-  vpc_id                         = data.aws_vpc.default.id
-  tags                           = module.tags.tags
-}
+# module "alb" {
+#   source                         = "../"
+#   region                         = var.region
+#   load_balancer_config           = local.load_balancer_config
+#   target_group_config            = local.target_group_config
+#   target_group_attachment_config = local.target_group_attachment_config
+#   alb_listener                   = local.alb_listener
+#   default_action                 = local.default_action
+#   listener_rules                 = local.listener_rules
+#   security_group_data            = local.security_group_data
+#   security_group_name            = local.security_group_name
+#   vpc_id                         = data.aws_vpc.default.id
+#   tags                           = module.tags.tags
+# }
 
 ################################################################################
 ## network load balancer
