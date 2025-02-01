@@ -18,6 +18,7 @@ data "aws_iam_policy_document" "alb_logs_policy" {
   }
 }
 
+# network
 data "aws_vpc" "default" {
   filter {
     name   = "tag:Name"
@@ -25,7 +26,6 @@ data "aws_vpc" "default" {
   }
 }
 
-# network
 data "aws_subnets" "private" {
   filter {
     name = "tag:Name"
