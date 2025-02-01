@@ -24,13 +24,13 @@ locals {
 
     access_logs = {
       enabled = false
-      bucket  = "arc-logs-bucket-alb-14"
+      bucket  = module.s3.bucket_id
       prefix  = "alb-logs"
     }
 
     connection_logs = {
       enabled = false
-      bucket  = "arc-logs-bucket-alb-14"
+      bucket  = module.s3.bucket_id
       prefix  = "connection-logs"
     }
   }

@@ -4,7 +4,7 @@
 
 ### Purpose of the Document
 
-This document provides guidelines and instructions for users looking to implement the Terraform module for supporting AWS Load Balancer
+This document outlines guidelines and instructions for users implementing the Terraform module for AWS Load Balance
 
 ### Module Overview
 
@@ -28,7 +28,6 @@ To use the module in your Terraform configuration, include the following source 
 module "alb" {
   source                         = "sourcefuse/arc-load-balancer/aws"
   version                        = "0.0.1"
-  region                         = var.region
   load_balancer_config           = local.load_balancer_config
   target_group_config            = local.target_group_config
   target_group_attachment_config = local.target_group_attachment_config
@@ -39,7 +38,6 @@ module "alb" {
   security_group_name            = local.security_group_name
   vpc_id                         = data.aws_vpc.default.id
   tags                           = module.tags.tags
-}
 }
 ```
 
