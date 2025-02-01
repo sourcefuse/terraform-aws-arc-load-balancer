@@ -1,10 +1,10 @@
 locals {
   security_group_name = "arc-alb-sg"
-  network_forward_action = true
+   network_forward_action = true
 
   load_balancer_config = {
     name                                        = "arc-load-balancer"
-    type                                        = "application"
+    type                                        = "network" 
     enable_deletion_protection                  = false
     enable_cross_zone_load_balancing            = true
     enable_http2                                = false
