@@ -46,10 +46,8 @@
 
 | Name | Description |
 |------|-------------|
-| <a name="output_alb_arn"></a> [alb\_arn](#output\_alb\_arn) | ARN of the ALB |
 | <a name="output_id"></a> [id](#output\_id) | ID of the load balancer |
 | <a name="output_nlb_arn"></a> [nlb\_arn](#output\_nlb\_arn) | ARN of the NLB |
 | <a name="output_security_group_ids"></a> [security\_group\_ids](#output\_security\_group\_ids) | Security group IDs created |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | ARN of the target group |
-| <a name="output_target_group_health_check"></a> [target\_group\_health\_check](#output\_target\_group\_health\_check) | Health check configuration of the target group |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
