@@ -1,14 +1,14 @@
-output "load_balancer_arn" {
+output "arn" {
   description = "ARN of the load balancer"
   value       = aws_lb.this.arn
 }
 
-output "load_balancer_dns_name" {
+output "dns_name" {
   description = "DNS name of the load balancer"
   value       = aws_lb.this.dns_name
 }
 
-output "load_balancer_id" {
+output "id" {
   description = "ID of the load balancer"
   value       = aws_lb.this.id
 }

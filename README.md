@@ -25,14 +25,14 @@ module "alb" {
   source                         = "sourcefuse/arc-load-balancer/aws"
   version                        = "0.0.1"
   region                         = var.region
-  load_balancer_config           = var.load_balancer_config
-  target_group_config            = var.target_group_config
-  target_group_attachment_config = var.target_group_attachment_config
-  alb_listener                   = var.alb_listener
-  default_action                 = var.default_action
-  listener_rules                 = var.listener_rules
-  security_group_data            = var.security_group_data
-  security_group_name            = var.security_group_name
+  load_balancer_config           = local.load_balancer_config
+  target_group_config            = local.target_group_config
+  target_group_attachment_config = local.target_group_attachment_config
+  alb_listener                   = local.alb_listener
+  default_action                 = local.default_action
+  listener_rules                 = local.listener_rules
+  security_group_data            = local.security_group_data
+  security_group_name            = local.security_group_name
   vpc_id                         = data.aws_vpc.default.id
   tags                           = module.tags.tags
 }
@@ -40,18 +40,17 @@ module "alb" {
 ################################################################################
 ## network load balancer
 ################################################################################
-
 module "nlb" {
   source                         = "sourcefuse/arc-load-balancer/aws"
   version                        = "0.0.1"
   region                         = var.region
-  load_balancer_config           = var.load_balancer_config
-  target_group_config            = var.target_group_config
-  target_group_attachment_config = var.target_group_attachment_config
-  alb_listener                   = var.alb_listener
-  network_forward_action         = var.network_forward_action
-  security_group_data            = var.security_group_data
-  security_group_name            = var.security_group_name
+  load_balancer_config           = local.load_balancer_config
+  target_group_config            = local.target_group_config
+  target_group_attachment_config = local.target_group_attachment_config
+  alb_listener                   = local.alb_listener
+  security_group_data            = local.security_group_data
+  network_forward_action         = local.network_forward_action
+  security_group_name            = local.security_group_name
   vpc_id                         = data.aws_vpc.default.id
   tags                           = module.tags.tags
 }
@@ -114,10 +113,10 @@ module "nlb" {
 
 | Name | Description |
 |------|-------------|
+| <a name="output_arn"></a> [arn](#output\_arn) | ARN of the load balancer |
+| <a name="output_dns_name"></a> [dns\_name](#output\_dns\_name) | DNS name of the load balancer |
+| <a name="output_id"></a> [id](#output\_id) | ID of the load balancer |
 | <a name="output_listener_arn"></a> [listener\_arn](#output\_listener\_arn) | ARN of the load balancer listener |
-| <a name="output_load_balancer_arn"></a> [load\_balancer\_arn](#output\_load\_balancer\_arn) | ARN of the load balancer |
-| <a name="output_load_balancer_dns_name"></a> [load\_balancer\_dns\_name](#output\_load\_balancer\_dns\_name) | DNS name of the load balancer |
-| <a name="output_load_balancer_id"></a> [load\_balancer\_id](#output\_load\_balancer\_id) | ID of the load balancer |
 | <a name="output_security_group_ids"></a> [security\_group\_ids](#output\_security\_group\_ids) | Security group IDs created |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | ARN of the target group |
 | <a name="output_target_group_health_check"></a> [target\_group\_health\_check](#output\_target\_group\_health\_check) | Health check configuration of the target group |

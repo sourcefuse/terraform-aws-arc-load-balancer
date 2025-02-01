@@ -36,14 +36,14 @@ module "tags" {
 module "alb" {
   source                         = "../"
   region                         = var.region
-  load_balancer_config           = var.load_balancer_config
-  target_group_config            = var.target_group_config
-  target_group_attachment_config = var.target_group_attachment_config
-  alb_listener                   = var.alb_listener
-  default_action                 = var.default_action
-  listener_rules                 = var.listener_rules
-  security_group_data            = var.security_group_data
-  security_group_name            = var.security_group_name
+  load_balancer_config           = local.load_balancer_config
+  target_group_config            = local.target_group_config
+  target_group_attachment_config = local.target_group_attachment_config
+  alb_listener                   = local.alb_listener
+  default_action                 = local.default_action
+  listener_rules                 = local.listener_rules
+  security_group_data            = local.security_group_data
+  security_group_name            = local.security_group_name
   vpc_id                         = data.aws_vpc.default.id
   tags                           = module.tags.tags
 }
@@ -54,13 +54,13 @@ module "alb" {
 module "nlb" {
   source                         = "../"
   region                         = var.region
-  load_balancer_config           = var.load_balancer_config
-  target_group_config            = var.target_group_config
-  target_group_attachment_config = var.target_group_attachment_config
-  alb_listener                   = var.alb_listener
-  network_forward_action         = var.network_forward_action
-  security_group_data            = var.security_group_data
-  security_group_name            = var.security_group_name
+  load_balancer_config           = local.load_balancer_config
+  target_group_config            = local.target_group_config
+  target_group_attachment_config = local.target_group_attachment_config
+  alb_listener                   = local.alb_listener
+  security_group_data            = local.security_group_data
+  network_forward_action         = local.network_forward_action
+  security_group_name            = local.security_group_name
   vpc_id                         = data.aws_vpc.default.id
   tags                           = module.tags.tags
 }

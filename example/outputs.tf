@@ -1,11 +1,11 @@
 output "alb_arn" {
   description = "ARN of the ALB"
-  value       = module.alb.load_balancer_arn
+  value       = module.alb.arn
 }
 
-output "load_balancer_id" {
+output "id" {
   description = "ID of the load balancer"
-  value       = module.alb.load_balancer_id
+  value       = module.alb.id
 }
 
 output "security_group_ids" {
