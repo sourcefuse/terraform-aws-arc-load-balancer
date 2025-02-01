@@ -83,7 +83,7 @@ locals {
     }
     stickiness = {
       enabled         = true
-      type            = "lb_cookie"
+      # type            = "lb_cookie"
       cookie_duration = 3600
     }
   }
