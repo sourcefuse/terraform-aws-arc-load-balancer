@@ -18,6 +18,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_alb"></a> [alb](#module\_alb) | ../ | n/a |
 | <a name="module_nlb"></a> [nlb](#module\_nlb) | ../ | n/a |
 | <a name="module_s3"></a> [s3](#module\_s3) | sourcefuse/arc-s3/aws | 0.0.4 |
 | <a name="module_tags"></a> [tags](#module\_tags) | sourcefuse/arc-tags/aws | 1.2.6 |
@@ -45,8 +46,9 @@
 
 | Name | Description |
 |------|-------------|
+| <a name="output_alb_arn"></a> [alb\_arn](#output\_alb\_arn) | ARN of the ALB |
 | <a name="output_id"></a> [id](#output\_id) | ID of the load balancer |
-| <a name="output_nlb_arn"></a> [nlb\_arn](#output\_nlb\_arn) | ARN of the NLB |
 | <a name="output_security_group_ids"></a> [security\_group\_ids](#output\_security\_group\_ids) | Security group IDs created |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | ARN of the target group |
+| <a name="output_target_group_health_check"></a> [target\_group\_health\_check](#output\_target\_group\_health\_check) | Health check configuration of the target group |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

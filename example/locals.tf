@@ -1,10 +1,10 @@
 locals {
-  security_group_name = "arc-alb-sg"
-   network_forward_action = true
+  security_group_name    = "arc-alb-sg"
+  network_forward_action = true
 
   load_balancer_config = {
     name                                        = "arc-load-balancer"
-    type                                        = "network"
+    type                                        = "application"
     enable_deletion_protection                  = false
     enable_cross_zone_load_balancing            = true
     enable_http2                                = false
@@ -24,13 +24,13 @@ locals {
 
     access_logs = {
       enabled = false
-      bucket  = "arc-terraform-alb-logs-1"
+      bucket  = "arc-logs-bucket-alb-14"
       prefix  = "alb-logs"
     }
 
     connection_logs = {
       enabled = false
-      bucket  = "arc-terraform-alb-logs-1"
+      bucket  = "arc-logs-bucket-alb-14"
       prefix  = "connection-logs"
     }
   }
@@ -68,7 +68,7 @@ locals {
   target_group_config = {
     name        = "arc-poc-alb"
     port        = 80
-    protocol    = "TCP"
+    protocol    = "HTTP"
     target_type = "instance"
     health_check = {
       enabled             = true
@@ -81,16 +81,16 @@ locals {
       healthy_threshold   = 2
       matcher             = "200"
     }
-    # stickiness = {
-    #   enabled         = true
-    #   # type            = "lb_cookie"
-    #   cookie_duration = 3600
-    # }
+    stickiness = {
+      enabled         = true
+      type            = "lb_cookie"
+      cookie_duration = 3600
+    }
   }
 
   target_group_attachment_config = [
     {
-      target_id   = "i-024cca3753df50299" # Instance ID
+      target_id   = "i-1234567890abcdef0"
       target_type = "instance"
       port        = 80
     }
@@ -111,7 +111,7 @@ locals {
 
   alb_listener = {
     port     = 88
-    protocol = "TCP"
+    protocol = "HTTP"
   }
 
   listener_rules = {
@@ -122,7 +122,7 @@ locals {
           type  = "redirect"
           order = 1
           redirect = {
-            host        = "divyasf.sourcef.us"
+            host        = "docs.example.com"
             path        = "/redirect"
             query       = "action=redirect"
             protocol    = "HTTPS"
