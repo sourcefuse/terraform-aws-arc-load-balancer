@@ -10,7 +10,65 @@
 
 ## Overview
 
-The SourceFuse AWS ARC Terraform module provides an easy way to deploy and manage Application Load Balancers (ALB) and Network Load Balancers (NLB). It ensures high availability by deploying load balancers across multiple Availability Zones and supports flexible traffic routing with customizable listener rules and target groups. The module also includes built-in security options to control traffic access via security groups and integrates with CloudWatch for performance monitoring and health checks. With this module, you can easily set up reliable and secure load balancing for both web (ALB) and TCP (NLB) traffic.
+This Terraform module provisions and configures an AWS Load Balancer (ALB/NLB) along with related resources such as target groups, listeners, listener rules, security groups, and logging configurations. It is designed for high availability, security, and scalability while allowing flexibility for integration with existing AWS infrastructure.
+
+### Features
+
+- Load Balancer
+
+- Supports Application Load Balancer (ALB) and Network Load Balancer (NLB)
+
+- Option for internal or external load balancer
+
+- Supports IPv4 and IPv6 addressing
+
+- Cross-zone load balancing for improved traffic distribution
+
+- Deletion protection to prevent accidental removal
+
+### Security and Access Control
+
+- Ability to attach security groups dynamically
+
+- Trust store support for managing client authentication securely
+
+### Target Groups & Attachments
+
+- Dynamic target group creation for EC2 instances, Lambda functions, or IP addresses
+
+- Supports stickiness policies for session persistence
+
+- Configurable health checks to monitor target availability
+
+- DNS failover & unhealthy state routing for improved reliability
+
+- Target failover handling for high availability
+
+### Logging and Monitoring
+
+- Access logging to Amazon S3 for audit and compliance
+
+- Connection logs to track network-level traffic
+
+### Listener & Listener Rules
+
+- Supports HTTP, HTTPS, TCP, and UDP listeners
+
+- Configurable SSL/TLS certificates for secure traffic
+
+- OIDC and Cognito authentication for secure access control
+
+- Supports redirect, fixed response, and forward actions
+
+### Custom Configurations
+
+- Subnet mappings to control network placement
+
+- Fine-grained control over timeouts, session stickiness, and routing policies
+
+- Weighted target group routing for intelligent traffic distribution
+
+
 
 ## Usage
 
