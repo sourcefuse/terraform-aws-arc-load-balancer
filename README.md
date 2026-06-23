@@ -17,6 +17,9 @@
 
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sourcefuse_terraform-aws-arc-load-balancer&token=6306baee2d5d0acf189ee2eecd9a6d354522c0b5)](https://sonarcloud.io/summary/new_code?id=sourcefuse_terraform-aws-arc-load-balancer)
 
+> [!TIP]
+> 🤖 **New:** Use this module with AI assistants via the [ARC IaC MCP Server](https://github.com/sourcefuse/arc-iac-mcp) — search, scaffold, and security-scan ARC modules from natural language. [Quick setup ↓](#ai-assistant-integration-arc-iac-mcp)
+
 ## Overview
 
 Creates Application Load Balancers (ALB) or Network Load Balancers (NLB) with listeners, target groups, listener rules, and security groups.
